@@ -1,13 +1,11 @@
-# UniGetUI Full Stack Installation Script
-# This script installs UniGetUI and its compatible package manager engines
-
+# --- Configuration ---
 $apps = @(
-    # The Main Interface
+    # The Main Interface & Version Control
     @{ Name = "UniGetUI";         ID = "MartiCliment.UniGetUI" },
+    @{ Name = "Git";              ID = "Git.Git" },
     
     # Core Package Managers
     @{ Name = "Chocolatey";       ID = "Chocolatey.Chocolatey" },
-    @{ Name = "Scoop";            ID = "ScoopInstaller.Scoop" },
     
     # Developer & Language Managers
     @{ Name = "Node.js (NPM)";    ID = "OpenJS.NodeJS" },
@@ -18,6 +16,17 @@ $apps = @(
 
 Write-Host "--- Preparing UniGetUI Environment ---" -ForegroundColor Cyan
 
+# 1. Install Scoop (Requires special handling)
+if (!(Get-Command scoop -ErrorAction SilentlyContinue)) {
+    Write-Host "Installing Scoop..." -ForegroundColor Yellow
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+    Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
+    if ($LASTEXITCODE -eq 0) { Write-Host ">> Scoop installed successfully!" -ForegroundColor Green }
+} else {
+    Write-Host ">> Scoop is already installed." -ForegroundColor Green
+}
+
+# 2. Install WinGet-based apps
 foreach ($app in $apps) {
     Write-Host "Processing $($app.Name)..." -ForegroundColor Yellow
     
@@ -36,4 +45,5 @@ foreach ($app in $apps) {
     }
 }
 
-Write-Host "--- Setup Complete. Please restart your terminal/PC to refresh PATH variables. ---" -ForegroundColor Cyan
+Write-Host "`n--- Setup Complete ---" -ForegroundColor Cyan
+Write-Host "IMPORTANT: Please RESTART your terminal or PC to refresh PATH variables." -ForegroundColor Red
